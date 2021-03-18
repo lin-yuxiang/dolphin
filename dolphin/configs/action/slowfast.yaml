@@ -1,0 +1,189 @@
+engine:
+    type: ActionRecognizerEngine
+algorithm:
+    type: SlowFast
+    pretrained:
+    pretrained_modules:
+    backbone:
+        type: ResNet3dSlowFast
+        resample_rate: 8
+        speed_ratio: 8
+        channel_ratio: 8
+        slow_pathway:
+            type: ResNet3dPathway
+            depth: 50
+            pretrained: None
+            lateral: True
+            conv1_kernel: [1, 7, 7]
+            dilations: [1, 1, 1, 1]
+            conv1_stride_t: 1
+            pool1_stride_t: 1
+            inflate: [0, 0, 1, 1]
+        fast_pathway:
+            type: ResNet3dPathway
+            depth: 50
+            pretrained: None
+            lateral: False
+            base_channels: 8
+            conv1_kernel: [5, 7, 7]
+            conv1_stride_t: 1
+            pool1_stride_t: 1
+    head:
+        type: SlowFastHead
+        num_classes: 400
+        in_channels: 2304
+        loss_cls: 
+            type: CrossEntropyLoss
+        spatial_type: avg
+        dropout_ratio: 0.5
+        init_std: 0.01
+train_cfg:
+test_cfg:
+    average_clips: prob
+    metrics: mean_class_accuracy
+train_pipeline: &train_pipeline
+    -
+        type: SampleFrames
+        clip_len: 32
+        frame_interval: 2
+        num_clips: 1
+    -
+        type: FrameLoader
+    -
+        type: Resize
+        key: imgs
+        img_scale: [224, 224]
+        multiscale_mode: value
+        keep_ratio: False
+    -
+        type: RandomFlip
+        keys: ['imgs']
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [123.675, 116.28, 103.53]
+        std: [58.395, 57.12, 57.375]
+        to_bgr: True
+    -
+        type: FormatShape
+        input_format: NCTHW
+    -
+        type: Collect
+        keys: ['imgs', 'label']
+    -
+        type: ToTensor
+        keys: ['imgs', 'label']
+val_pipeline: &val_pipeline
+    -
+        type: SampleFrames
+        clip_len: 32
+        frame_interval: 2
+        num_clips: 1
+        test_mode: True
+    -
+        type: FrameLoader
+    -
+        type: Resize
+        key: imgs
+        img_scale: [224, 224]
+        keep_ratio: False
+    -
+        type: RandomFlip
+        keys: ['imgs']
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [123.675, 116.28, 103.53]
+        std: [58.395, 57.12, 57.375]
+        to_bgr: True
+    -
+        type: FormatShape
+        input_format: NCTHW
+    -
+        type: Collect
+        keys: ['imgs', 'labels']
+    -
+        type: ToTensor
+        keys: ['imgs']
+test_pipeline: &test_pipeline
+    -
+        type: SampleFrames
+        clip_len: 32
+        frame_interval: 2
+        num_clips: 10
+        test_mode: True
+    -
+        type: FrameLoader
+    -
+        type: Resize
+        key: imgs
+        img_scale: [224, 224]
+        keep_ratio: False
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [123.675, 116.28, 103.53]
+        std: [58.395, 57.12, 57.375]
+        to_bgr: True
+    -
+        type: FormatShape
+        input_format: NCTHW
+    -
+        type: Collect
+        keys: ['imgs', 'labels']
+    -
+        type: ToTensor
+        keys: ['imgs']
+data:
+    samples_per_gpu: 8
+    workers_per_gpu: 4
+    train:
+        type: RawframeDataset
+        ann_file:
+        pipeline: *train_pipeline
+        data_prefix:
+        test_mode: False
+    val:
+        type: RawframeDataset
+        ann_file:
+        pipeline: *val_pipeline
+        data_prefix:
+        test_mode: True
+    test:
+        type: RawframeDataset
+        ann_file:
+        pipeline: *test_pipeline
+        data_prefix:
+        test_mode: True
+runtime:
+    log:
+        config_path: /userhome/code/cta/pclcv/configs/logger.yaml
+        logger_name: pclcv
+        filename: pcl_fixed_pretrained.log
+        console_level: INFO
+        file_level: DEBUG
+    load_from:
+        filename:
+        map_location: cpu
+        strict: False
+    resume_from:
+        filename:
+        resume_optimizer: True
+        map_location: default
+    optimizer:
+        type: SGD
+        lr: 0.1
+        momentum: 0.9
+        weight_decay: 0.0001
+    lr_config:
+        policy: step
+        step: [200, 240]
+    checkpoint_cfg:
+        interval: 10
+    total_epochs: 256
+    vis_interval: 1
+    work_dir:
+    gpus: 1
+    gpu_ids: [0]
+    seed:
+    work_flow: [['train', 10], ['val', 1]]

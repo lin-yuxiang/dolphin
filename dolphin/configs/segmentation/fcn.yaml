@@ -1,0 +1,166 @@
+engine:
+    type: SegmentationEngine
+algorithm:
+    type: FCN
+    pretrained:
+    pretrained_modules:
+    backbone:
+        type: ResNetV1c
+        depth: 50
+        num_stages: 4
+        out_indices: [0, 1, 2, 3]
+        dilations: [1, 1, 2, 4]
+        strides: [1, 2, 1, 1]
+        norm_eval: False
+        contract_dilation: True
+    head:
+        type: FCNHead
+        num_classes: 19
+        in_channels: 2048
+        in_index: 3
+        channels: 512
+        num_convs: 2
+        concat_input: True
+        dropout_ratio: 0.1
+        loss:
+            type: CrossEntropyLoss
+            loss_weight: 1.0
+    auxiliary_head:
+        type: FCNHead
+        num_classes: 19
+        in_channels: 1024
+        channels: 256
+        num_convs: 1
+        concat_input: False
+        dropout_ratio: 0.1
+        align_corners: False
+        loss:
+            type: CrossEntropyLoss
+            loss_weight: 0.4
+train_cfg:
+test_cfg:
+    mode: whole
+    evaluate_metric: mIoU
+train_pipeline: &train_pipeline
+    -
+        type: LoadImageFromFile
+    -
+        type: LoadSegmentationMap
+    -
+        type: Resize
+        key: imgs
+        img_scale: [2048, 512]
+        ratio_range: [0.5, 2.0]
+    -
+        type: RandomCrop
+        keys: ['imgs', 'label']
+        crop_size: [[512, 512], [512, 512]]
+        cat_max_ratio: 0.75
+    -
+        type: RandomFlip
+        keys: ['imgs', 'label']
+        flip_ratio: 0.5
+    -
+        type: PhotoMetricDistortion
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [123.675, 116.28, 103.53]
+        std: [58.395, 57.12, 57.375]
+    -
+        type: Pad
+        keys: ['imgs', 'label']
+        size: [[512, 512], [512, 512]]
+        pad_val: [[0], [255]]
+    -
+        type: Collect
+        keys: ['imgs', 'label']
+        meta_keys: ['imgs_cfg']
+        meta_name: ['img_meta']
+    -
+        type: ToTensor
+        keys: ['imgs', 'label']
+test_pipeline: &test_pipeline
+    -
+        type: LoadImageFromFile
+    -
+        type: Resize
+        key: imgs
+        img_scale: [2048, 512]
+        keep_ratio: True
+    -
+        type: RandomFlip
+        keys: ['imgs']
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [123.675, 116.28, 103.53]
+        std: [58.395, 57.12, 57.375]
+    -
+        type: Collect
+        keys: ['imgs']
+        meta_keys: ['imgs_cfg']
+        meta_name: ['img_meta']
+    -
+        type: ToTensor
+        keys: ['imgs']
+data:
+    samples_per_gpu: 4
+    workers_per_gpu: 4
+    train:
+        type: PascalVOCDataset
+        ann_file: ImageSets/Segmentation/train.txt
+        pipeline: *train_pipeline
+        img_dir: JPEGImages
+        ann_dir: SegmentationClass
+        data_prefix:
+        test_mode: False 
+    val:
+        type: PascalVOCDataset
+        ann_file: ImageSets/Segmentation/val.txt
+        pipeline: *train_pipeline
+        img_dir: JPEGImages
+        ann_dir: SegmentationClass
+        data_prefix:
+        test_mode: True
+    test:
+        type: PascalVOCDataset
+        ann_file: ImageSets/Segmentation/test.txt
+        pipeline: *test_pipeline
+        img_dir: JPEGImages
+        ann_dir: SegmentationClass
+        data_prefix:
+        test_mode: True
+runtime:
+    log:
+        config_path:
+        logger_name: pcl
+        filename: pcl.log
+        console_level: INFO
+        file_level: DEBUG
+    load_from:
+        filename:
+        map_location: cpu
+        strict: False
+    resume_from:
+        filename:
+        resume_optimizer: True
+        map_location: default
+    optimizer:
+        type: SGD
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0005
+    lr_config:
+        policy: step
+        step: [16, 18]
+        gamma: 0.1
+    checkpoint_cfg:
+        interval: 10
+    total_epochs: 20
+    vis_interval: 1
+    work_dir:
+    gpus: 1
+    gpu_ids: [0]
+    seed: 
+    work_flow: [['train', 1]]

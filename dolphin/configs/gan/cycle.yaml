@@ -1,0 +1,197 @@
+engine:
+    type: CycleGANEngine
+algorithm:
+    type: CycleGAN
+    pretrained:
+    pretrained_modules:
+    direction: AtoB
+    generator_a:
+        type: UnetGenerator
+        in_channels: 3
+        out_channels: 3
+        num_downs: 7 # or 8
+        num_filters: 64
+        init_gain: 0.02
+        norm_type: instance
+        use_dropout: True
+    generator_b:
+        type: UnetGenerator
+        in_channels: 3
+        out_channels: 3
+        num_downs: 7 # or 8
+        num_filters: 64
+        init_gain: 0.02
+        norm_type: instance
+        use_dropout: True
+    discriminator_a:
+        type: NLayerDiscriminator
+        in_channels: 3
+        num_filters: 64
+        n_layers: 3
+        norm_type: instance
+    discriminator_b:
+        type: NLayerDiscriminator
+        in_channels: 3
+        num_filters: 64
+        n_layers: 3
+        norm_type: instance
+    loss_gan:
+        type: GANLoss
+        gan_mode: lsgan
+        target_real_label: 1.0
+        target_fake_label: 0.0
+        loss_weight: 1.0
+    loss_cycle_A:
+        type: L1Loss
+        loss_weight: 10.0
+    loss_cycle_B:
+        type: L1Loss
+        loss_weight: 10.0
+    loss_idt:
+        type: L1Loss
+        loss_weight: 0.5
+train_cfg:
+    pool_size: 50
+test_cfg:
+train_pipeline: &train_pipeline
+    -
+        type: LoadImageFromFile
+        to_float32: True
+        color_type: color
+    -
+        type: Resize
+        key: A
+        img_scale: [286, 286]
+        multiscale_mode: value
+        keep_ratio: False
+        interpolation: bicubic
+    -
+        type: Resize
+        key: B
+        img_scale: [286, 286]
+        multiscale_mode: value
+        keep_ratio: False
+        interpolation: bicubic
+    -
+        type: RandomCrop
+        keys: ['A']
+        crop_size: [256, 256]
+    -
+        type: RandomCrop
+        keys: ['B']
+        crop_size: [256, 256]
+    -
+        type: RandomFlip
+        keys: ['A']
+    -
+        type: RandomFlip
+        keys: ['B']
+    -
+        type: Normalize
+        keys: ['A', 'B']
+        mean: [[0.5], [0.5]]
+        std: [[0.5], [0.5]]
+    -
+        type: Transpose
+        keys: ['A', 'B']
+        order: [2, 0, 1]
+    -
+        type: ToTensor
+        keys: ['A', 'B']
+    -
+        type: Zip
+        out_keys: imgs
+        zip_keys: ['A', 'B']
+    -
+        type: Collect
+        keys: ['imgs']
+val_pipeline: *train_pipeline
+test_pipeline: &test_pipeline
+    -
+        type: LoadImageFromFile
+        to_float32: True
+        color_type: color
+    -
+        type: Transpose
+        keys: ['A', 'B']
+        order: [2, 0, 1]
+    -
+        type: ToTensor
+        keys: ['A', 'B']
+    -
+        type: Zip
+        out_keys: imgs
+        zip_keys: ['A', 'B']
+    -
+        type: ToDataContainer
+        key: filename
+        cpu_only: True
+    -
+        type: Collect
+        keys: ['imgs', 'filename']
+data:
+    samples_per_gpu: 4
+    workers_per_gpu: 0
+    train:
+        type: UnalignedDataset
+        ann_file: 
+        pipeline: *train_pipeline
+        serial_batches: False
+        data_prefix: /userhome/data/gan/horse2zebra
+        test_mode: False
+    val:
+        type: UnalignedDataset
+        ann_file:
+        pipeline: *train_pipeline
+        serial_batches: False
+        data_prefix: /userhome/data/gan/horse2zebra
+        test_mode: True
+    test:
+        type: UnalignedDataset
+        ann_file:
+        pipeline: *train_pipeline
+        serial_batches: True
+        data_prefix: /userhome/data/gan/horse2zebra
+        test_mode: True
+runtime:
+    log:
+        config_path: configs/logger.yaml
+        logger_name: pcl
+        filename: pcl.log
+        console_level: INFO
+        file_level: DEBUG
+    load_from:
+        filename:
+        map_location: cpu
+        strict: False
+    resume_from:
+        filename:
+        resume_optimizer: True
+        map_location: default
+    optimizer:
+        G:
+            type: Adam
+            lr: 0.0002
+            betas: [0.5, 0.999]
+        D:
+            type: Adam
+            lr: 0.0002
+            betas: [0.5, 0.999]
+    lr_config:
+        G:
+            policy: step
+            step: [50]
+            gamma: 0.1
+        D:
+            policy: step
+            step: [50]
+            gamma: 0.1
+    checkpoint_cfg:
+        interval: 10
+    total_epochs: 100
+    vis_interval: 1
+    work_dir: ./work_dir
+    gpus: 1
+    gpu_ids: [0]
+    seed: 
+    work_flow: [['train', 1]]

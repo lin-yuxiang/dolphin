@@ -1,0 +1,99 @@
+engine:
+    type: ActivateLearningEngine
+algorithm:
+    type: ActivateLearning
+    pretrained:
+    pretrained_modules:
+    backbone:
+        type: ActivateLearningBackbone
+        in_channels: 1
+    head:
+        type: ActivateLearningHead
+        num_classes: 10
+        in_channels: 320
+        dropout_ratio: 0.5
+        loss:
+            type: CrossEntropyLoss
+    strategy:
+        type: EntropySampling
+        query_round: 10
+        num_query: 1000
+train_cfg:
+test_cfg:
+train_pipeline: &train_pipeline
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [0.1307]
+        std: [0.3081]
+        to_rgb: False
+    -
+        type: Transpose
+        keys: ['imgs']
+        order: [2, 0, 1]
+    -
+        type: ToTensor
+        keys: ['imgs', 'label']
+val_pipeline: *train_pipeline
+test_pipeline: &test_pipeline
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [0.1307]
+        std: [0.3081]
+        to_rgb: False
+    -
+        type: Transpose
+        keys: ['imgs']
+        order: [2, 0, 1]
+    -
+        type: ToTensor
+        keys: ['imgs']
+data:
+    samples_per_gpu: 64
+    workers_per_gpu: 4
+    train:
+        type: MnistDataset
+        ann_file:
+        pipeline: *train_pipeline
+        num_classes: 10
+        data_prefix: ../data/activate_learning
+        test_mode: False
+        init_labels: 10000
+    test:
+        type: MnistDataset
+        ann_file:
+        pipeline: *test_pipeline
+        num_classes: 10
+        data_prefix: ../data/activate_learning
+        test_mode: True
+        init_labels: 10000
+runtime:
+    log:
+        config_path: configs/logger.yaml
+        logger_name: pclcv
+        filename: pcl.log
+        console_level: INFO
+        file_level: DEBUG
+    load_from:
+        filename:
+        map_location: cpu
+        strict: False
+    resume_from:
+        filename:
+        resume_optimizer: True
+        map_location: default
+    optimizer:
+        type: SGD
+        lr: 0.01
+        momentum: 0.5
+    lr_config:
+    checkpoint_cfg:
+        interval: 10
+    total_epochs: 120
+    vis_interval: 1
+    work_dir: ./work_dir
+    gpus: 1
+    gpu_ids: [0]
+    seed:
+    work_flow: [['train', 1], ['query', 1], ['test', 1]]

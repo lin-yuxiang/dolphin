@@ -1,0 +1,17 @@
+Introduction
+============
+
+Algorithms within this project are divided into four main modules: **model**,
+**loss**, **dataset** and **engine**, that are managed by *Register* mechanics.
+And the importing and configuration of modules, parameters are format as *yaml* 
+files.
+
+
+Structure
+=========
+
+look :ref:`fuck <fuck>`
+
+look :ref:`intro <intro>`
+
+look :ref:`nif <nif>`

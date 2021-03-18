@@ -1,0 +1,201 @@
+engine:
+    type: ActionDetectionEngine
+algorithm:
+    type: MovingCenterDetector
+    pretrained:
+    pretrained_modules:
+    backbone:
+        type: DLASeg
+        depth: 34
+        levels: [1, 1, 1, 2, 2, 1]
+        channels: [16, 32, 64, 128, 256, 512]
+        down_ratio: 4
+        last_level: 5
+        out_channels: 64
+    head:
+        type: MOCHead
+        in_channels: 64
+        head_conv: 256
+        num_classes: 21
+        output_stride: 4
+        K: 7
+        max_output_objects: 100
+        hm_loss:
+            type: FocalLoss
+            loss_weight: 1.0
+        mov_loss:
+            type: RegL1Loss
+            loss_weight: 1.0
+        wh_loss:
+            type: RegL1Loss
+            loss_weight: 0.1
+train_cfg:
+test_cfg:
+    inference_dir:
+    iou_thresh: 
+    metric: frameAP
+    dump_resulst: True
+train_pipeline: &train_pipeline
+    -
+        type: SequentialSampleFrames
+    -
+        type: FrameLoader
+    -
+        type: LoadTubeletLabel
+        norm_box: True
+    -
+        type: ConvertBoxFormat
+        key: gt_bbox
+        to_format: xywh
+        begin_idx: 1
+    -
+        type: RandomFlip
+        keys: ['imgs']
+        with_box: True
+        box_key: gt_bbox
+        to_xyxy: True
+        restore_size: True
+        begin_idx: 0
+    -
+        type: ConvertBoxFormat
+        key: gt_bbox
+        to_format: xyxy
+        begin_idx: 1
+    -
+        type: PhotoMetricDistortion
+        brightness_delta: 32
+        contrast_range: [0.5, 0.5]
+        saturation_range: [0.5, 0.5]
+        with_saturation: True
+        with_value: False
+        hue_delta: 18
+    -
+        type: RandomExpand
+    -
+        type: Resize
+        key: imgs
+        keep_ratio: True
+        img_scale: [288, 288]
+        multiscale_mode: value
+        with_box: True
+        output_stride: 4
+        box_key: gt_bbox
+        begin_idx: 0
+    - 
+        type: Normalize
+        mean: [0.40789654, 0.44719302, 0.47026115]
+        std: [0.28863828, 0.27408164, 0.27809835]
+        to_rgb: True
+    -
+        type: Transpose
+        keys: ['imgs']
+        order: [2, 0, 1]
+    -
+        type: GenerateMOCHeatmap
+        max_objects: 128
+    -
+        type: Zip
+        out_keys: video_meta
+        zip_keys: ['video_name, 'frame_idx', 'gt_bbox', 'imgs_cfg']
+    -
+        type: Zip
+        out_keys: label
+        zip_keys: ['hm', 'mov', 'wh', 'mask', 'index', 'index_all']
+    -
+        type: Collect
+        keys: ['imgs', 'label', 'video_meta']
+    -
+        type: ToTensor
+        keys: ['imgs', 'label']
+test_pipeline: &test_pipeline
+    -
+        type: SequentialSampleFrames
+    -
+        type: FrameLoader
+    -
+        type: Resize
+        key: imgs
+        keep_ratio: True
+        img_scale: [288, 288]
+        multiscale_mode: value
+        with_box: False
+    - 
+        type: Normalize
+        mean: [0.40789654, 0.44719302, 0.47026115]
+        std: [0.28863828, 0.27408164, 0.27809835]
+        to_rgb: True
+    -
+        type: Transpose
+        keys: ['imgs']
+        order: [2, 0, 1]
+    -
+        type: Zip
+        out_keys: video_meta
+        zip_keys: ['video_name', 'frame_idx', 'imgs_cfg']
+    -
+        tpye: Collect
+        keys: ['imgs', 'video_meta']
+    -
+        type: ToTensor
+        keys: ['imgs']
+data:
+    samples_per_gpu: 8
+    workers_per_gpu: 2
+    train: 
+        type: JHMDBDataset
+        ann_file:
+        pipeline: *train_pipeline
+        data_prefix:
+        test_mode: False
+        num_classes: 21
+        K: 7
+        split: 1
+    val:
+        type: JHMDBDataset
+        ann_file:
+        pipeline: *train_pipeline
+        data_prefix:
+        test_mode: True
+        num_classes: 21
+        K: 7
+        split: 1
+    test:
+        type: JHMDBDataset
+        ann_file:
+        pipeline: *test_pipeline
+        data_prefix:
+        test_mode: True
+        num_classes: 21
+        K: 7
+        split: 1
+runtime:
+    log:
+        config_path:
+        logger_name: pclcv
+        filename: pcl_fixed_pretrained.log
+        console_level: INFO
+        file_level: DEBUG
+    load_from:
+        filename:
+        map_location: cpu
+        strict: False
+    resume_from:
+        filename:
+        resume_optimizer: True
+        map_location: default
+    optimizer:
+        type: Adam
+        lr: 0.0005
+        weight_decay:
+    lr_config:
+        policy: step
+        step: [6, 8]
+    checkpoint_cfg:
+        interval: 1
+    total_epochs: 30
+    vis_interval: 1
+    work_dir:
+    gpus: 1
+    gpu_ids: [0]
+    seed:
+    work_flow: [['train', 1]]

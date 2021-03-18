@@ -1,0 +1,239 @@
+engine:
+    type: DetectionEngine
+algorithm:
+    type: FasterRCNN
+    pretrained:
+    pretrained_modules:
+    backbone:
+        type: ResNet
+        depth: 50
+        num_stages: 4
+        out_indices: [0, 1, 2, 3]
+        frozen_stages: 1
+        norm_eval: True
+    neck:
+        type: FPN
+        in_channels: [256, 512, 1024, 2048]
+        out_channels: 256
+        num_outs: 5
+    rpn_head:
+        type: RPNHead
+        num_classes: 1
+        in_channels: 256
+        feat_channels: 256
+        anchor_generator:
+            scales: [8]
+            ratios: [0.5, 1.0, 2.0]
+            strides: [4, 8, 16, 32, 64]
+        box_coder:
+            target_means: [.0, .0, .0, .0]
+            target_stds: [1.0, 1.0, 1.0, 1.0]
+        sampler:
+            num: 256
+            pos_fraction: -0.5
+            neg_pos_ub: -1
+            add_gt_as_proposal: False
+        assigner:
+            pos_iou_thr: 0.7
+            neg_iou_thr: 0.3
+            min_pos_iou: 0.3
+            match_low_quality: True
+            ignore_iof_thr: -1
+        allowed_border: -1
+        pos_weight: -1
+        reg_decoded_bbox: False
+        background_label: 0
+        loss_cls: 
+            type: CrossEntropyLoss
+            use_sigmoid: True
+        loss_bbox:
+            type: L1Loss
+    roi_head:
+        type: StandardRoIHead
+        bbox_roi_extractor:
+            roi_layer:
+                type: RoIAlign
+                out_size: 7
+                sample_num: 0
+            out_channels: 256
+            featmap_strides: [4, 8, 16, 32]
+        bbox_head:
+            type: Shared2FCBBoxHead
+            in_channels: 256
+            fc_out_channels: 1024
+            roi_feat_size: 7
+            num_classes: 80
+            bbox_coder:
+                target_means: [0., 0., 0., 0.]
+                target_std: [0.1, 0.1, 0.1, 0.1]
+            reg_class_agnostic: False
+            loss_cls:
+                type: CrossEntropyLoss
+                use_sigmoid: False
+                loss_weight: -1.0
+            loss_bbox:
+                type: L1Loss
+                loss_weight: -1.0
+        assigner:
+            pos_iou_thr: 0.5
+            neg_iou_thr: 0.5
+            min_pos_iou: 0.5
+            match_low_quality: False
+            ignore_iof_thr: -1
+        sampler:
+            num: 512
+            pos_fraction: 0.5
+            neg_pos_ub: -1
+            add_gt_as_proposal: True
+        pos_weight: -1
+train_cfg:
+test_cfg:
+    evaluate:
+        metric: bbox
+        jsonfile_prefix:
+        classwise: False
+        proposal_nums: [100, 300, 1000]
+    rpn:
+        nms_across_levels: False
+        nms_pre: 1000
+        nms_post: 1000
+        max_num: 1000
+        nms_thr: 0.7
+        min_bbox_size: 0
+    rcnn:
+        score_thr: 0.05
+        nms:
+            type: nms
+            iou_thr: 0.5
+            max_per_img: 100
+train_pipeline: &train_pipeline
+    -
+        type: LoadImageFromFile
+    -
+        type: Resize
+        key: imgs
+        img_scale: [1333, 800]
+        keep_ratio: True
+        with_box: True
+        box_key: gt_bbox
+        begin_idx: 0
+    -
+        type: ConvertBoxFormat
+        key: gt_bbox
+        begin_idx: 0
+        to_format: xywh
+    -
+        type: RandomFlip
+        keys: ['imgs']
+        with_box: True
+        box_key: gt_bbox
+        begin_idx: 0
+    -
+        type: ConvertBoxFormat
+        key: gt_bbox
+        begin_idx: 0
+        to_format: xyxy
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [123.675, 116.28, 103.53]
+        std: [58.395, 57.12, 57.375]
+        to_rgb: True
+    -
+        type: ToTensor
+        keys: ['imgs', 'gt_bbox', 'label']
+    -
+        type: Collect
+        keys: ['imgs', 'gt_bbox', 'label']
+        meta_keys: ['imgs_cfg']
+        meta_name: ['img_meta']
+val_pipeline: &val_pipeline
+test_pipeline: &test_pipeline
+    -
+        type: LoadImageFromFile
+    -
+        type: Resize
+        key: imgs
+        img_scale: [1333, 800]
+        keep_ratio: True
+        with_box: False
+    -
+        type: RandomFlip
+        keys: ['imgs']
+        with_box: False
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [123.675, 116.28, 103.53]
+        std: [58.395, 57.12, 57.375]
+        to_rgb: True
+    -
+        type: ToTensor
+        keys: ['imgs']
+    -
+        type: Collect
+        keys: ['imgs']
+        meta_keys: ['imgs_cfg']
+        meta_name: ['img_meta']
+data:
+    samples_per_gpu: 2
+    workers_per_gpu: 2
+    train:
+        ann_file:
+        img_prefix:
+        data_prefix:
+        pipeline: *train_pipeline
+        test_mode: False
+        proposal_file:
+        filter_empty_gt: True
+    val:
+        ann_file:
+        img_prefix:
+        data_prefix:
+        pipeline: *train_pipeline
+        test_mode: True
+        proposal_file:
+        filter_empty_gt: True
+    test:
+        ann_file:
+        img_prefix:
+        data_prefix:
+        pipeline: *test_pipeline
+        test_mode: True
+        proposal_file:
+        filter_empty_gt: True
+runtime:
+    log:
+        config_path:
+        logger_name: pcl
+        filename: pcl.log
+        console_level: INFO
+        file_level: DEBUG
+    load_from:
+        filename:
+        map_location: cpu
+        strict: False
+    resume_from:
+        filename:
+        resume_optimizer: True
+        map_location: default
+    optimizer:
+        type: SGD
+        lr: 0.02
+        momentun: 0.9
+        weight_decay: 0.0001
+    lr_config:
+        policy: step
+        step: [8, 11]
+        warmup: linear
+        warmup_iters: 500
+        warmup_ratio: 0.00
+    checkpoint_cfg:
+        interval: 1
+    total_epochs: 12
+    vis_interval: 1
+    work_dir:
+    gpus: 1
+    gpu_ids: [0]
+    seed: 
+    work_flow: [['train', 1]]

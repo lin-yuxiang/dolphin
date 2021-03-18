@@ -1,0 +1,9 @@
+build/
+__pycache__/
+*.egg-info*/
+ext.*
+*.so
+.ipynb_checkpoints/
+work_dir/
+data/*/
+.vscode/

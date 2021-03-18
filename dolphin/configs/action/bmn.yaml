@@ -1,0 +1,149 @@
+engine:
+    type: ActionLocalizationEngine
+algorithm:
+    type: BoundaryMatchingNetwork
+    pretrained:
+    pretrained_modules:
+    backbone:
+    head:
+        type: BMNHead
+        temporal_scale: 100
+        prop_boundary_ratio: 0.5
+        num_samples: 32
+        num_samples_per_bin: 3
+        feat_dim: 400
+        hidden_dim_1d: 256
+        hidden_dim_2d: 128
+        hidden_dim_3d: 512
+        tem_loss:
+            type: TemporalEvaluationModuleLoss
+            loss_weight: 1.0
+            tem_thresh: 0.5
+        pem_reg_loss:
+            type: ProposalEvaluationModuleRegressionLoss
+            loss_weight: 10.0
+            pem_reg_low: 0.3
+            pem_reg_high: 0.7
+        pem_cls_loss:
+            type: ProposalEvaluationModuleClassificationLoss
+            loss_weight: 1.0
+            pem_cls_thresh: 0.9
+            eps: 0.00001
+train_cfg:
+test_cfg:
+    soft_nms_alpha: 0.4
+    soft_nms_low_thres: 0.5
+    soft_nms_high_thresh: 0.9
+    post_process_top_k: 100
+    output:
+    eval_config:
+        metrics: AR@AN
+        max_avg_proposals: 100
+train_pipeline: &train_pipeline
+    -
+        type: LoadLocalizationFeature
+        raw_feature_ext: .csv
+    -
+        type: LoadLocalizationLabels
+    -
+        type: Collect
+        keys: ['raw_feature', 'gt_bbox']
+    -
+        type: ToTensor
+        keys: ['raw_feature']
+    -
+        type: ToDataContainer
+        key: gt_bbox
+        stack: False
+        cpu_only: True
+val_pipeline: &val_pipeline
+    -
+        type: LoadLocalizationFeature
+        raw_feature_ext: .csv
+    -
+        type: LoadLocalizationLabels
+    -
+        type: Zip
+        out_keys: video_meta
+        zip_keys:
+            ['video_name', 'duration_second', 'duration_frame', 'annotations',
+             'feature_frame']
+    -
+        type: Collect
+        keys: ['raw_feature', 'gt_bbox', 'video_meta']
+    -
+        type: ToTensor
+        keys: ['imgs']
+    -
+        type: ToDataContainer
+        key: gt_bbox
+        stack: False
+        cpu_only: True
+test_pipeline: &test_pipeline
+    -
+        type: LoadLocalizationFeature
+        raw_feature_ext: .csv
+    -
+        type: Zip
+        out_keys: video_meta
+        zip_keys:
+            ['video_name', 'duration_second', 'duration_frame', 'annotations',
+             'feature_frame']
+    -
+        type: Collect
+        keys: ['raw_feature', 'video_meta']
+    -
+        type: ToTensor
+        keys: ['raw_feature']
+data:
+    samples_per_gpu: 8
+    workers_per_gpu: 4
+    train:
+        type: ActivityNetDataset
+        ann_file:
+        pipeline: *train_pipeline
+        data_prefix:
+        test_mode: False
+    val:
+        type: ActivityNetDataset
+        ann_file:
+        pipeline: *val_pipeline
+        data_prefix:
+        test_mode: True
+    test:
+        type: ActivityNetDataset
+        ann_file:
+        pipeline: *test_pipeline
+        data_prefix:
+        test_mode: True
+runtime:
+    log:
+        config_path:
+        logger_name: pclcv
+        filename: pcl_fixed_pretrained.log
+        console_level: INFO
+        file_level: DEBUG
+    load_from:
+        filename:
+        map_location: cpu
+        strict: False
+    resume_from:
+        filename:
+        resume_optimizer: True
+        map_location: default
+    optimizer:
+        type: Adam
+        lr: 0.001
+        weight_decay: 0.0001
+    lr_config:
+        policy: step
+        step: [7]
+    checkpoint_cfg:
+        interval: 1
+    total_epochs: 9
+    vis_interval: 1
+    work_dir:
+    gpus: 1
+    gpu_ids: [0]
+    seed:
+    work_flow: [['train', 9], ['test', 1]]

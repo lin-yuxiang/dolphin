@@ -1,0 +1,24 @@
+config:
+    version: 1
+    formatters:
+        simple:
+            format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        with_line:
+            format: '%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s'
+    handlers:
+        console:
+            class: logging.StreamHandler
+            level: DEBUG
+            formatter: with_line
+        file:
+            class: logging.FileHandler
+            filename: log.log
+            level: DEBUG
+            formatter: with_line
+    loggers:
+        StreamLogger:
+            handlers: ['console']
+            level: DEBUG
+        FileLogger:
+            handlers: ['console', 'file']
+            level: DEBUG

@@ -1,0 +1,9 @@
+numpy
+pyyaml
+torch
+torchvision
+opencv-python
+terminaltables
+motmetrics
+pandas
+lap

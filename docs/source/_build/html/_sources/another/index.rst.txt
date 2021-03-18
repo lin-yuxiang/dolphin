@@ -1,0 +1,9 @@
+Introduction of another
+=======================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: another
+   :hidden:
+
+   another.rst

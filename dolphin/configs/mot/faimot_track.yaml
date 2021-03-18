@@ -1,0 +1,130 @@
+engine:
+    type: MOTEngine
+algorithm:
+    type: FairMOT
+    pretrained:
+    pretrained_modules:
+    down_ratio: 4
+    num_classes: 1
+    frame_rate: 30
+    track_buffer: 30
+    conf_thres: 0.6
+    max_objs: 128
+    min_box_area: 200
+    backbone:
+        type: DLASeg
+        depth: 34
+        level: [1, 1, 1, 2, 2, 1]
+        channels: [16, 32, 64, 128, 256, 512]
+        down_ratio: 4
+        last_level: 5
+        out_channels: 0
+    head:
+        type: FairMOTShareHead
+        channels: [16, 32, 64, 128, 256, 512]
+        down_ratio: 4
+        final_kernel: 1
+        head_conv: 256
+        num_classes: 1
+        det_head:
+            typd: FairMOTDetHead
+            cat_spec_wh: False
+            reg_offset: True
+            offset: 2
+            hm_loss:
+                type: FocalLoss 
+                loss_weight: 1.0
+            wh_loss:
+                type: RegL1Loss
+                loss_weight: 0.1
+            offset_loss:
+                type: RegL1Loss
+                loss_weight: 1.0
+        id_head:
+            type: FairMOTReIDHead
+            reid_dim: 512
+            reid_nID: 14455
+            id_loss:
+                type: CrossEntropyLoss
+                loss_weight: 1.0
+                ignore_index: -1
+    filter:
+        type: KalmanFilter
+train_cfg:
+test_cfg:
+    save_images: True
+    save_videos: False
+    sequences: []
+    iou_thresh:
+    num_classes: 1
+    down_ratio: 4
+    cat_spec_wh: False
+    max_objs: 128
+test_pipeline: &test_pipeline
+    -
+        type: LoadImageFromFile
+        to_float32: True
+        color_type: color
+    -
+        type: LetterBoxResize
+        keys: ['imgs']
+        img_scale: [608, 1088]
+        border_color: [127.5, 127.5, 127.5]
+        interpolation: 'area'
+        with_box: False
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: 0
+        std: 255.0
+        to_rgb: True
+    -
+        type: Transpose
+        keys: ['imgs']
+        order: [2, 0, 1]
+    -
+        type: ToTensor
+        keys: ['imgs']
+    -
+        type: Collect
+        keys: ['imgs']
+data:
+    samples_per_gpu: 1
+    workers_per_gpu: 4
+    test:
+        type: MultiSequenceDataset
+        ann_file:
+        pipeline: *test_pipeline
+        data_prefix:
+        test_mode: True
+runtime:
+    log:
+        config_path:
+        logger_name: pcl
+        filename: pcl.log
+        console_level: INFO
+        file_level: DEBUG
+    load_from:
+        filename:
+        map_location: cpu
+        strict: False
+    resume_from:
+        filename:
+        resume_optimizer: True
+        map_location: default
+    optimizer:
+        type:
+        lr:
+    lr_config:
+        policy: step
+        step: []
+        gamma:
+    checkpoint_cfg:
+        interval: 10
+    total_epochs: 1
+    vis_interval: 1
+    work_dir:
+    gpus: 1
+    gpu_ids: [0]
+    seed: 
+    work_flow: [['test_track', 1]]

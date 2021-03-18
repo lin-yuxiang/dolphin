@@ -1,0 +1,291 @@
+engine:
+    type: MOTEngine
+algorithm:
+    type: FairMOT
+    pretrained:
+    pretrained_modules:
+    down_ratio: 4
+    num_classes: 1
+    frame_rate: 30
+    track_buffer: 30
+    conf_thres: 0.6
+    max_objs: 128
+    min_box_area: 200
+    backbone:
+        type: DLASeg
+        depth: 34
+        level: [1, 1, 1, 2, 2, 1]
+        channels: [16, 32, 64, 128, 256, 512]
+        down_ratio: 4
+        last_level: 5
+        out_channels: 0
+    head:
+        type: FairMOTShareHead
+        channels: [16, 32, 64, 128, 256, 512]
+        down_ratio: 4
+        final_kernel: 1
+        head_conv: 256
+        num_classes: 1
+        det_head:
+            type: FairMOTDetHead
+            cat_spec_wh: False
+            reg_offset: True
+            offset: 2
+            hm_loss:
+                type: FocalLoss 
+                loss_weight: 1.0
+            wh_loss:
+                type: RegL1Loss
+                loss_weight: 0.1
+            offset_loss:
+                type: RegL1Loss
+                loss_weight: 1.0
+        id_head:
+            type: FairMOTReIDHead
+            reid_dim: 512
+            reid_nID: 14455
+            id_loss:
+                type: CrossEntropyLoss
+                loss_weight: 1.0
+                ignore_index: -1
+    filter:
+        type: KalmanFilter
+train_cfg:
+test_cfg:
+    save_images: True
+    save_videos: False
+    sequences: []
+    iou_thresh:
+    num_classes: 1
+    down_ratio: 4
+    cat_spec_wh: False
+    max_objs: 128
+train_pipeline: &train_pipeline
+    -
+        type: LoadImageFromFile
+        to_float32: True
+        color_type: color
+    -
+        type: LoadSequentialBoundingBoxFromFile
+        restore_size: True
+        xywh2xyxy: True
+        joint_data: False
+    -
+        type: PhotoMetricDistortion
+        brightness_delta: 0
+        contrast_range: [1.0, 1.0]
+        saturation_range: [0.5, 1.5]
+        with_saturation: True
+        value_range: [0.5, 1.5]
+        with_value: True
+        hue_delta: 0
+    -
+        type: LetterBoxResize
+        keys: ['imgs']
+        img_scale: [608, 1088]
+        border_color: [127.5, 127.5, 127.5]
+        interpolation: 'area'
+        with_box: True
+        box_key: label
+    -
+        type: RandomAffine
+        keys: ['imgs']
+        degrees: [-5, 5]
+        translate: [0.1, 0.1]
+        scale: [0.5, 1.2]
+        shear: [-2, 2]
+        border_value: [127.5, 127.5, 127.5]
+        with_box: True
+        box_key: label
+        to_xywh: True
+    -
+        type: RandomFlip
+        keys: ['imgs']
+        flip_ratio: 1
+        direction: 'horizontal'
+        with_box: True
+        box_key: label
+        begin_idx: 2
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: 0
+        std: 1
+        to_rgb: True
+    -
+        type: Transpose
+        keys: ['imgs']
+        order: [2, 0, 1]
+    -
+        type: GenerateLabelMap
+        down_ratio: 4
+        num_classes: 1
+        max_objs: 128
+    -
+        type: ToTensor
+        keys: ['imgs', 'hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids']
+    -
+        type: Zip
+        out_keys: label
+        zip_keys: ['hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids']
+    -
+        type: Collect
+        keys: ['imgs', 'label']
+test_det_pipeline: &test_det_pipeline
+    -
+        type: LoadImageFromFile
+        to_float32: True
+        color_type: color
+    -
+        type: LoadSequentialBoundingBoxFromFile
+        restore_size: True
+        xywh2xyxy: True
+        joint_data: False
+    -
+        type: PhotoMetricDistortion
+        brightness_delta: 0
+        contrast_range: [1.0, 1.0]
+        saturation_range: [0.5, 1.5]
+        with_saturation: True
+        value_range: [0.5, 1.5]
+        with_value: True
+        hue_delta: 0
+    -
+        type: LetterBoxResize
+        keys: ['imgs']
+        img_scale: [608, 1088]
+        border_color: [127.5, 127.5, 127.5]
+        interpolation: 'area'
+        with_box: True
+        box_key: label
+    -
+        type: RandomAffine
+        keys: ['imgs']
+        degrees: [-5, 5]
+        translate: [0.1, 0.1]
+        scale: [0.5, 1.2]
+        shear: [-2, 2]
+        border_value: [127.5, 127.5, 127.5]
+        with_box: True
+        box_key: label
+        to_xywh: True
+    -
+        type: RandomFlip
+        keys: ['imgs']
+        flip_ratio: 0.5
+        direction: 'horizontal'
+        with_box: True
+        box_key: label
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [0.408, 0.447, 0.470]
+        std: [0.289, 0.274, 0.278]
+        to_rgb: True
+    -
+        type: Transpose
+        keys: ['imgs']
+        order: [2, 0, 1]
+    -
+        type: ToTensor
+        keys: ['imgs', 'label']
+    -
+        type: ToDataContainer
+        stack: True
+        padding_value: 0
+        cpu_only: False
+        pad_dims: 2
+    -
+        type: Collect
+        keys: ['imgs', 'label']
+test_emb_pipeline: &test_emb_pipeline
+    -
+        type: LoadImageFromFile
+        to_float32: True
+        color_type: color
+    -
+        type: LoadSequentialBoundingBoxFromFile
+        restore_size: True
+        xywh2xyxy: True
+        joint_data: False
+    -
+        type: LetterBoxResize
+        keys: ['imgs']
+        img_scale: [608, 1088]
+        border_color: [127.5, 127.5, 127.5]
+        interpolation: 'area'
+        with_box: True
+        box_key: label
+    -
+        type: Normalize
+        keys: ['imgs']
+        mean: [0.408, 0.447, 0.470]
+        std: [0.289, 0.274, 0.278]
+        to_rgb: True
+    -
+        type: Transpose
+        keys: ['imgs']
+        order: [2, 0, 1]
+    -
+        type: GenerateLabelMap
+        down_ratio: 4
+        num_classes: 1
+        max_objs: 128
+    -
+        type: ToTensor
+        keys: ['imgs', 'hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids']
+    -
+        type: Collect
+        keys: ['imgs', 'hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids']
+    -
+        type: Zip
+        out_keys: label
+        zip_keys: ['hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids']
+data:
+    samples_per_gpu: 8
+    workers_per_gpu: 2
+    train:
+        type: JointDataset
+        ann_file:
+            MOT17: /userhome/code/pclcv_transit/data/mot/mot17_train.txt
+        pipeline: *train_pipeline
+        data_prefix: /userhome/data/mot
+        test_mode: False
+    val:
+    test:
+        type: JointDataset
+        ann_file:
+        pipeline:
+        data_prefix:
+        test_mode: True
+runtime:
+    log:
+        config_path: ./configs/logger.yaml
+        logger_name: pcl
+        filename: pcl.log
+        console_level: INFO
+        file_level: DEBUG
+    load_from:
+        filename:
+        map_location: cpu
+        strict: False
+    resume_from:
+        filename:
+        resume_optimizer: True
+        map_location: default
+    optimizer:
+        type: Adam
+        lr: 0.0001
+    lr_config:
+        policy: step
+        step: [20, 27]
+        gamma: 0.1
+    checkpoint_cfg:
+        interval: 10
+    total_epochs: 30
+    vis_interval: 1
+    work_dir: ./work_dir
+    gpus: 1
+    gpu_ids: [0]
+    seed: 
+    work_flow: [['train', 1]]
