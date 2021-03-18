@@ -7,3 +7,4 @@ ext.*
 work_dir/
 data/*/
 .vscode/
+.DS_Store
