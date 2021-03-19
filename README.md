@@ -1,6 +1,6 @@
 <div  align="center">
 <img src="image/dolphin_logo.png" width = "400" height = "300">
-</div>
+</div></br>
 
 
 Documentation: https://open-dolphin.readthedocs.io
