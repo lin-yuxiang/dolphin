@@ -1,4 +1,9 @@
-# PCLCV
+<div align='center' ><font size='50'>OpenI Dolphin</font></div>
+
+
+<center>
+<img src="image/dolphin_logo.png" width = "400" height = "300" alt="OpenI Dolphin" align=center />
+</center>
 
 ---
 

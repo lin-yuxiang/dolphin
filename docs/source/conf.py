@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'OpenDolphin'
+project = 'OpenI Dolphin'
 copyright = '2020, linyx'
 author = 'linyx'
 

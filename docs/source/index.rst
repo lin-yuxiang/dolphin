@@ -1,4 +1,4 @@
-OpenDolphin Documentation
+OpenI Dolphin Documentation
 ==========================
 
 Welcome to project ``Dolphin``, which is an open source collection of algorithms 
@@ -45,7 +45,7 @@ in this documentation.
 
 .. toctree::
    :maxdepth: 1
-   :caption: OpenDolphin Documentation
+   :caption: OpenI Dolphin Documentation
    :hidden:
 
    /configuration/index.rst
