@@ -1,13 +1,9 @@
-<p align="center">
-<font size="200">Dolphin</font>
-</p>
-
-
 <div  align="center">
-<img src="image/dolphin_logo.png" width = "400" height = "300" alt="OpenI Dolphin" align=center />
+<img src="image/dolphin_logo.png" width = "400" height = "300">
 </div>
 
----
+
+Documentation: https://open-dolphin.readthedocs.io
 
 ## Introduction
 
