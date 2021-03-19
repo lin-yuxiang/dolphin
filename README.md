@@ -1,8 +1,6 @@
-<div align='center' >
-<font size='800'>
-OpenI Dolphin
-</font>
-</div>
+<p align="center">
+<font size="200">Dolphin</font>
+</p>
 
 
 <div  align="center">
