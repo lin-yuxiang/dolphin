@@ -13,6 +13,8 @@
 
 Documentation: https://open-dolphin.readthedocs.io
 
+--------
+
 ## Introduction
 
 **Dolphin** is an open-source computer vision algorithm library in fields of *Object Detection*, *Semantic Segmentation*, *Video Action Analysis*, *Mono Depth Estimation*, *Generative Adversarial Networks* and *Activate Learning*.
