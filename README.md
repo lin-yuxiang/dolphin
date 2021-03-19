@@ -1,6 +1,10 @@
 # OpenI Dolphin
-[![Documentation Status](https://readthedocs.org/projects/open-dolphin/badge/?version=latest)](https://open-dolphin.readthedocs.io/en/latest/?badge=latest)
 
+[![Documentation Status](https://readthedocs.org/projects/open-dolphin/badge/?version=latest)](https://open-dolphin.readthedocs.io/en/latest/?badge=latest)
+[![Python Version](https://img.shields.io/badge/python-3.6%20%7C%203.7-blue)](https://img.shields.io/badge/python-3.6%20%7C%203.7-blue)
+[![Github Last Commit](https://img.shields.io/github/last-commit/lin-yuxiang/dolphin)](https://img.shields.io/github/last-commit/lin-yuxiang/dolphin)
+[![Repo Size](https://img.shields.io/github/repo-size/lin-yuxiang/dolphin)](https://img.shields.io/github/repo-size/lin-yuxiang/dolphin)
+</br>
 
 <div  align="center">
 <img src="image/dolphin.png" width = "500" height = "500">
