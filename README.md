@@ -1,3 +1,7 @@
+# OpenI Dolphin
+[![Documentation Status](https://readthedocs.org/projects/open-dolphin/badge/?version=latest)](https://open-dolphin.readthedocs.io/en/latest/?badge=latest)
+
+
 <div  align="center">
 <img src="image/dolphin.png" width = "500" height = "500">
 </div></br>
@@ -11,7 +15,15 @@ Documentation: https://open-dolphin.readthedocs.io
 
 ## Installation
 
-The code was tested under environment of python 3.7, ubuntu 16.04 and CUDA 10.0+. It's recommended to create virtual environment using Conda ``conda create --name pclcv python=3.7`` . Then clone this repo and install the prerequisites by ``pip install -r $(PCLCV_ROOT)/requirement.txt`` . Afterwards, run ``python setup.py develop`` and ``pip install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonAPI`` for installing entire project.
+The code was tested under environment of python 3.7, ubuntu 16.04 and CUDA 10.0+. It's recommended to create virtual environment using Conda:
+```shell
+conda create --name pclcv python=3.7
+```  
+Then clone this repo and install the prerequisites by 
+```shell
+pip install -r $(PCLCV_ROOT)/requirement.txt
+pip install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonAPI
+```
 
 ## Data Preparation
 
