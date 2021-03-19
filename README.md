@@ -2,7 +2,7 @@
 
 [![Github Last Commit](https://img.shields.io/github/last-commit/lin-yuxiang/dolphin)](https://img.shields.io/github/last-commit/lin-yuxiang/dolphin)
 [![Documentation Status](https://readthedocs.org/projects/open-dolphin/badge/?version=latest)](https://open-dolphin.readthedocs.io/en/latest/?badge=latest)
-[![Python Version](https://img.shields.io/badge/python-3.6%20%7C%203.7-blue)](https://img.shields.io/badge/python-3.6%20%7C%203.7-blue)
+[![Python Version](https://img.shields.io/badge/python-3.6%20%7C%203.7-orange)](https://img.shields.io/badge/python-3.6%20%7C%203.7-orange)
 [![Repo Size](https://img.shields.io/github/repo-size/lin-yuxiang/dolphin)](https://img.shields.io/github/repo-size/lin-yuxiang/dolphin)
 </br>
 
@@ -34,7 +34,7 @@ pip install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonA
 Firstly create a corresponding directory in the root dir of project, for example ``mkdir $(DOLPHIN_ROOT)/data/depth`` , then run the data creating script at ``$(DOLPHIN_ROOT)/scripts/depth/create.sh`` , to download dataset and pretrained models if needed. These paths should be assigned in the configuration file for training or testing. 
 NOTE: For task of activate learning, we use MNIST dataset which can be downloaded by torchvision automatically, so it's not necessary to run the create script for dataest, but in the configuration file the path of *data_prefix* should be set up to indicate the data location.
 
-## Run
+## Quick Start
 
 ### Import Modules:
 
