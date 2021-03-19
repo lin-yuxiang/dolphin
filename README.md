@@ -1,5 +1,5 @@
 <div  align="center">
-<img src="image/dolphin.png" width = "300" height = "300">
+<img src="image/dolphin.png" width = "500" height = "500">
 </div></br>
 
 
