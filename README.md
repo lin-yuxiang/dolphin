@@ -1,9 +1,9 @@
-<div align='center' ><font size='50'>OpenI Dolphin</font></div>
+<div align='center' ><font size='80'>OpenI Dolphin</font></div>
 
 
-<center>
+<div  align="center">
 <img src="image/dolphin_logo.png" width = "400" height = "300" alt="OpenI Dolphin" align=center />
-</center>
+</div>
 
 ---
 
