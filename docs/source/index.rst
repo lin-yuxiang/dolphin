@@ -1,11 +1,12 @@
 OpenI Dolphin Documentation
 ==========================
 
-Welcome to project ``Dolphin``, which is an open source collection of algorithms 
+Welcome to project ``Dolphin``, which is an open source framework of algorithms 
 using deep learning in several fields of computer vision based on **PyTorch**:
 *Object Detection*, *Generative Adversarial Network*, *Video Action Analysis*, 
 *Mono Depth Estimation*, *Activate Learning*, *Object Tracking* and 
-*Segmentation*, aiming to simplifies algorithms research experiments.
+*Segmentation*, aiming to promote learning of deep-learning based computer vision 
+algorithms and simultaneously simplifies algorithms research experiments.
 
 .. note::
    This documentation contains only API introduction of the project, the 
