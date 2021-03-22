@@ -2,12 +2,11 @@ import torch
 import torch.nn as nn
 
 from dolphin.models.utils import normal_init
-from dolphin.utils import Registers
-from dolphin.base.base_model_module import BaseModelModule
+from dolphin.utils import Registers, base
 
 
 @Registers.head.register
-class ClassifierHead3D(BaseModelModule):
+class ClassifierHead3D(base.BaseModelModule):
 
     def __init__(self,
                  num_classes,

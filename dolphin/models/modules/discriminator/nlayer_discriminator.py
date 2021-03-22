@@ -1,13 +1,12 @@
 import torch.nn as nn
 import functools
 
-from dolphin.utils import Registers
-from dolphin.base.base_model_module import BaseModelModule
+from dolphin.utils import Registers, base
 from dolphin.models.utils import Identity
 
 
 @Registers.discriminator.register
-class NLayerDiscriminator(BaseModelModule):
+class NLayerDiscriminator(base.BaseModelModule):
     """Defines a PatchGAN discriminator"""
 
     def __init__(self, 

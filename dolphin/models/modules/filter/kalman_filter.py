@@ -1,12 +1,11 @@
 import numpy as np
 import scipy.linalg
 
-from dolphin.utils import Registers
-from dolphin.base.base_model_module import BaseModelModule
+from dolphin.utils import Registers, base
 
 
 @Registers.filter.register
-class KalmanFilter(BaseModelModule):
+class KalmanFilter(base.BaseModelModule):
     """
     A simple Kalman filter for tracking bounding boxes in image space.
 

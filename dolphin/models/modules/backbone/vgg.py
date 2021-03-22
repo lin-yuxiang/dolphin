@@ -1,13 +1,12 @@
 import torch
 import torch.nn as nn
 
-from dolphin.base.base_model_module import BaseModelModule
-from dolphin.utils import Registers
+from dolphin.utils import Registers, base
 from dolphin.models.utils import load_checkpoint, constant_init, kaiming_init
 
 
 @Registers.backbone.register
-class VGG(BaseModelModule):
+class VGG(base.BaseModelModule):
 
     arch_settings = {
         11: (64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'),

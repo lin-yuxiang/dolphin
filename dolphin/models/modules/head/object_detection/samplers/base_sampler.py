@@ -1,11 +1,11 @@
 import torch
 from abc import ABCMeta, abstractmethod
 
-from dolphin.base.base_module import BaseModule
+from dolphin.utils import base
 from .sampling_result import SamplingResult
 
 
-class BaseSampler(BaseModule, metaclass=ABCMeta):
+class BaseSampler(base.BaseModule, metaclass=ABCMeta):
 
     def __init__(self,
                  num,

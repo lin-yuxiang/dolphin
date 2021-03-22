@@ -1,11 +1,11 @@
 import torch
 
 from .assign_result import AssignResult
-from dolphin.base.base_model_module import BaseModelModule
 from ..iou_calculators import BboxOverlaps2D
+from dolphin.utils import base
 
 
-class MaxIoUAssigner(BaseModelModule):
+class MaxIoUAssigner(base.BaseModelModule):
     def __init__(self,
                 pos_iou_thr=0.7,
                 neg_iou_thr=0.3,

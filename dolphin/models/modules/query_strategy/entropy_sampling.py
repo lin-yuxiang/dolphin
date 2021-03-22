@@ -2,12 +2,11 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 
-from dolphin.base.base_model_module import BaseModelModule
-from dolphin.utils import Registers, Bar
+from dolphin.utils import Registers, Bar, base
 
 
 @Registers.strategy.register
-class EntropySampling(BaseModelModule):
+class EntropySampling(base.BaseModelModule):
 
     def __init__(self, **kwargs):
 

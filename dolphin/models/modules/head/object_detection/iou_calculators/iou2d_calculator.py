@@ -1,9 +1,9 @@
 import torch
 
-from dolphin.base.base_module import BaseModule
+from dolphin.utils import base
 
 
-class BboxOverlaps2D(BaseModule):
+class BboxOverlaps2D(base.BaseModule):
 
     def __init__(self):
         super().__init__()

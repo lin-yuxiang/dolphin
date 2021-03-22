@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 import warnings
 
-from dolphin.utils import Registers, build_module_from_registers
+from dolphin.utils import Registers, build_module_from_registers, base
 from dolphin.models.utils import kaiming_init, load_checkpoint, load_checkpoint_
 from .resnet3d import ResNet3d
 
@@ -161,7 +161,7 @@ class ResNet3dPathway(ResNet3d):
         if new_shape[1] != old_shape[1]:
             new_channels = new_shape[1] - old_shape[1]
             # pad_shape = old_shape
-            pad_shape = pad_shape[:1] + (new_channels, ) + pad_shape[2:]
+            pad_shape = old_shape[:1] + (new_channels, ) + old_shape[2:]
             conv2d_weight = torch.cat(
                 (conv2d_weight,
                  torch.zeros(pad_shape).type_as(conv2d_weight).to(

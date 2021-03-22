@@ -1,13 +1,12 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-from dolphin.base.base_model_module import BaseModelModule
 from dolphin.models.utils import xavier_init
-from dolphin.utils import Registers
+from dolphin.utils import Registers, base
 
 
 @Registers.neck.register
-class FeaturePyramidNetwork(BaseModelModule):
+class FeaturePyramidNetwork(base.BaseModelModule):
     def __init__(self,
                  in_channels,
                  out_channels,

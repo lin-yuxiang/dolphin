@@ -2,14 +2,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from dolphin.base.base_model_module import BaseModelModule
-from dolphin.utils import Registers
+from dolphin.utils import Registers, base
 from dolphin.models.utils import normal_init
 from dolphin.loss import accuracy
 
 
 @Registers.head.register
-class FCNHead(BaseModelModule):
+class FCNHead(base.BaseModelModule):
 
     def __init__(self,
                  in_channels,

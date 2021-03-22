@@ -3,8 +3,7 @@ import math
 import torch.nn as nn
 import torch.nn.functional as F
 
-from dolphin.utils import Registers
-from dolphin.base.base_model_module import BaseModelModule
+from dolphin.utils import Registers, base
 from dolphin.models.utils import load_checkpoint, normal_init, constant_init
 
 
@@ -87,7 +86,7 @@ class UpProject(nn.Module):
 
 
 @Registers.decoder.register
-class FCRNUpProjection(BaseModelModule):
+class FCRNUpProjection(base.BaseModelModule):
 
     def __init__(self, pad_mode='left'):
         super(FCRNUpProjection, self).__init__()

@@ -1,9 +1,8 @@
-from dolphin.base.base_algorithm import BaseAlgorithm
-from dolphin.utils import Registers
+from dolphin.utils import Registers, base
 
 
 @Registers.algorithm.register
-class ActivateLearning(BaseAlgorithm):
+class ActivateLearning(base.BaseAlgorithm):
 
     def __init__(self,
                  pretrained=None,

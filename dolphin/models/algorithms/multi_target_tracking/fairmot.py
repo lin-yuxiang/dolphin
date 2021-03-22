@@ -3,15 +3,14 @@ import torch
 import torch.nn.functional as F
 
 from . import matching
-from dolphin.base.base_algorithm import BaseAlgorithm
 from .base_tracker import (BaseTrack, TrackState, STrack, joint_stracks, 
                            sub_stracks, remove_duplicate_stracks)
 from dolphin.utils import (Registers, build_module_from_registers, mot_decode, 
-                         ctdet_post_process, tranpose_and_gather_feat)
+                         ctdet_post_process, tranpose_and_gather_feat, base)
 
 
 @Registers.algorithm.register
-class FairMOT(BaseAlgorithm):
+class FairMOT(base.BaseAlgorithm):
     def __init__(self,
                  pretrained=None,
                  pretrained_modules=None,

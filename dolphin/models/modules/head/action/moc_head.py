@@ -1,13 +1,12 @@
 import torch
 import torch.nn as nn
 
-from dolphin.base.base_model_module import BaseModelModule
 from dolphin.utils.postprocess import moc_decode, moc_post_process
-from dolphin.utils import Registers, build_module_from_registers
+from dolphin.utils import Registers, build_module_from_registers, base
 
 
 @Registers.head.register
-class MOCHead(BaseHead):
+class MOCHead(base.BaseModelModule):
 
     def __init__(self,
                  in_channels=0,

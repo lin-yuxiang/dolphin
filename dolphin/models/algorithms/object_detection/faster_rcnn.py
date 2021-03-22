@@ -1,9 +1,8 @@
-from dolphin.base.base_algorithm import BaseAlgorithm
-from dolphin.utils import Registers, build_module_from_registers
+from dolphin.utils import Registers, build_module_from_registers, base
 
 
 @Registers.algorithm.register
-class FasterRCNN(BaseAlgorithm):
+class FasterRCNN(base.BaseAlgorithm):
 
     def __init__(self,
                  pretrained=None,

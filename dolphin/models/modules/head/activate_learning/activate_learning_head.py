@@ -1,13 +1,12 @@
 import torch
 import torch.nn as nn
 
-from dolphin.base.base_model_module import BaseModelModule 
 from dolphin.models.utils import normal_init
-from dolphin.utils import Registers, build_module_from_registers
+from dolphin.utils import Registers, build_module_from_registers, base
 
 
 @Registers.head.register
-class ActivateLearningHead(BaseModelModule):
+class ActivateLearningHead(base.BaseModelModule):
 
     def __init__(self,
                  num_classes,

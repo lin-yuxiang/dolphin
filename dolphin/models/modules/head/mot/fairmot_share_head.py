@@ -4,12 +4,11 @@ import torch.nn.functional as F
 import numpy as np
 import math
 
-from dolphin.utils import Registers
-from dolphin.base.base_model_module import BaseModelModule 
+from dolphin.utils import Registers, base
 
 
 @Registers.head.register
-class FairMOTShareHead(BaseModelModule):
+class FairMOTShareHead(base.BaseModelModule):
 
     def __init__(self,
                  channels=None,

@@ -2,8 +2,7 @@ import torch.nn as nn
 import torch.utils.checkpoint as cp
 
 from dolphin.models.utils import kaiming_init, constant_init, load_checkpoint
-from dolphin.utils import Registers
-from dolphin.base.base_model_module import BaseModelModule
+from dolphin.utils import Registers, base
 
 
 def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):
@@ -203,7 +202,7 @@ class ResLayer(nn.Sequential):
 
 
 @Registers.backbone.register
-class ResNet(BaseModelModule):
+class ResNet(base.BaseModelModule):
     __factory = {
         18: (BasicBlock, (2, 2, 2, 2)),
         34: (BasicBlock, (3, 4, 6, 3)),

@@ -1,12 +1,11 @@
 import torch.nn as nn
 
-from dolphin.base.base_model_module import BaseModelModule
 from dolphin.models.utils import load_checkpoint, kaiming_init, constant_init
-from dolphin.utils import Registers
+from dolphin.utils import Registers, base
 
 
 @Registers.backbone.register
-class ActivateLearningBackbone(BaseModelModule):
+class ActivateLearningBackbone(base.BaseModelModule):
 
     def __init__(self, in_channels=1):
         super(ActivateLearningBackbone, self).__init__()

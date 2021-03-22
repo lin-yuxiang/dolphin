@@ -2,12 +2,11 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 
-from dolphin.base.base_model_module import BaseModelModule
-from dolphin.utils import Registers, Bar
+from dolphin.utils import Registers, Bar, base
 
 
 @Registers.strategy.register
-class LeastConfidenceSampling(BaseModelModule):
+class LeastConfidenceSampling(base.BaseModelModule):
 
     def __init__(self, **kwargs):
 

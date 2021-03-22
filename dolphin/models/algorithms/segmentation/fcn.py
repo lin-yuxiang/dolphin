@@ -1,12 +1,11 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-from dolphin.base.base_algorithm import BaseAlgorithm
-from dolphin.utils import Registers, build_module_from_registers
+from dolphin.utils import Registers, build_module_from_registers, base
 
 
 @Registers.algorithm.register
-class FCN(BaseAlgorithm):
+class FCN(base.BaseAlgorithm):
 
     def __init__(self,
                  pretrained=None,

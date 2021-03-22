@@ -3,14 +3,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.utils import _pair
 
-from dolphin.utils import multi_apply, build_module_from_registers
+from dolphin.utils import multi_apply, build_module_from_registers, base
 from dolphin.utils.extensions import multiclass_nms
 from dolphin.loss import accuracy
 from ..coder import DeltaXYWHBBoxCoder
-from dolphin.base.base_model_module import BaseModelModule
 
 
-class BBoxHead(BaseModelModule):
+class BBoxHead(base.BaseModelModule):
     def __init__(self,
                  with_avg_pool=False,
                  with_reg=True,

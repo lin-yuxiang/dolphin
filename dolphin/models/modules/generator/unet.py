@@ -2,13 +2,12 @@ import torch
 import torch.nn as nn
 import functools
 
-from dolphin.utils import Registers
-from dolphin.base.base_model_module import BaseModelModule
+from dolphin.utils import Registers, base
 from dolphin.models.utils import load_checkpoint, normal_init, Identity
 
 
 @Registers.generator.register
-class UnetGenerator(BaseModelModule):
+class UnetGenerator(base.BaseModelModule):
     """Create a Unet-based generator"""
 
     def __init__(self, 
@@ -89,7 +88,7 @@ class UnetGenerator(BaseModelModule):
         return self.model(input)
 
 
-class UnetSkipConnectionBlock(nn.Module):
+class UnetSkipConnectionBlock(base.BaseModelModule):
     """Defines the Unet submodule with skip connection.
         X -------------------identity----------------------
         |-- downsampling -- |submodule| -- upsampling --|

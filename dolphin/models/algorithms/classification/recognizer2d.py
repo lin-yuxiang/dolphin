@@ -1,9 +1,8 @@
-from dolphin.utils import Registers
-from dolphin.base.base_algorithm import BaseRecognizer
+from dolphin.utils import Registers, base
 
 
 @Registers.algorithm.register
-class Recognizer2D(BaseRecognizer):
+class Recognizer2D(base.BaseRecognizer):
 
     def __init__(self,
                  pretrained=None,

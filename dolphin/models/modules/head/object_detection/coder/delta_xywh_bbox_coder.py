@@ -1,10 +1,10 @@
 import numpy as np
 import torch
 
-from dolphin.base.base_model_module import BaseModelModule
+from dolphin.utils import base
 
 
-class DeltaXYWHBBoxCoder(BaseModelModule):
+class DeltaXYWHBBoxCoder(base.BaseModelModule):
     def __init__(self,
                 target_means=(0., 0., 0., 0.),
                 target_stds=(1., 1., 1., 1.)):

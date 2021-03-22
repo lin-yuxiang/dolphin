@@ -2,12 +2,11 @@ import numpy as np
 import torch
 
 from torch.nn.modules.utils import _pair
-from dolphin.utils import Registers
-from dolphin.base.base_model_module import BaseModelModule
+from dolphin.utils import Registers, base
 
 
 @Registers.anchor_generator.register
-class AnchorGenerator(BaseModelModule):
+class AnchorGenerator(base.BaseModelModule):
     def __init__(self,
                 strides,
                 ratios,

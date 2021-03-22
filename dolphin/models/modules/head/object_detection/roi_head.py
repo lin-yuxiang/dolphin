@@ -1,13 +1,12 @@
-from dolphin.base.base_model_module import BaseModelModule
 from .assigner import MaxIoUAssigner
 from .samplers import RandomSampler
 from .roi_extractors import SingleRoIExtractor
-from dolphin.utils import Registers, build_module_from_registers
+from dolphin.utils import Registers, build_module_from_registers, base
 from dolphin.utils.postprocess import bbox2result, bbox2roi
 
 
 @Registers.head.register
-class StandardRoIHead(BaseModelModule):
+class StandardRoIHead(base.BaseModelModule):
 
     def __init__(self,
                  bbox_roi_extractor=dict(

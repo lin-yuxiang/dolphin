@@ -3,8 +3,7 @@ import torch.nn as nn
 import torch.utils.checkpoint as cp
 from torch.nn.modules.utils import _ntuple, _triple
 
-from dolphin.base.base_model_module import BaseModelModule
-from dolphin.utils import Registers
+from dolphin.utils import Registers, base
 from dolphin.models.utils import (load_checkpoint_, load_checkpoint, 
                                 kaiming_init, constant_init)
 
@@ -230,7 +229,7 @@ class Bottleneck3d(nn.Module):
 
 
 @Registers.backbone.register
-class ResNet3d(BaseModelModule):
+class ResNet3d(base.BaseModelModule):
     arch_settings = {
         18: (BasicBlock3d, (2, 2, 2, 2)),
         34: (BasicBlock3d, (3, 4, 6, 3)),

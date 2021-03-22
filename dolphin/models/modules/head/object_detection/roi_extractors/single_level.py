@@ -1,11 +1,10 @@
 import torch
 import torch.nn as nn
 
-from dolphin.utils import extensions
-from dolphin.base.base_model_module import BaseModelModule
+from dolphin.utils import extensions, base
 
 
-class SingleRoIExtractor(BaseModelModule):
+class SingleRoIExtractor(base.BaseModelModule):
 
     def __init__(self,
                  roi_layer,

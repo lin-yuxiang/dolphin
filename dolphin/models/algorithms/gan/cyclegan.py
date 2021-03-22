@@ -1,10 +1,9 @@
-from dolphin.base.base_algorithm import BaseAlgorithm
-from dolphin.utils import Registers, build_module_from_registers
+from dolphin.utils import Registers, build_module_from_registers, base
 from dolphin.models.utils import ImagePool
 
 
 @Registers.algorithm.register
-class CycleGAN(BaseAlgorithm):
+class CycleGAN(base.BaseAlgorithm):
 
     def __init__(self,
                  direction='AtoB',

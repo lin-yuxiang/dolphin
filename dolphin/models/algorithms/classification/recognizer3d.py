@@ -1,11 +1,10 @@
 import torch.nn.functional as F
 
-from dolphin.base.base_algorithm import BaseAlgorithm
-from dolphin.utils import Registers
+from dolphin.utils import Registers, base
 
 
 @Registers.algorithm.register
-class Recognizer3D(BaseAlgorithm):
+class Recognizer3D(base.BaseAlgorithm):
 
     def __init__(self,
                  pretrained=None,

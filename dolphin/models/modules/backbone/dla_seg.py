@@ -1,13 +1,12 @@
 import numpy as np
 
-from dolphin.utils import Registers
+from dolphin.utils import Registers, base
 from .dla import DLA, DLAUp, IDAUp, BasicBlock
-from dolphin.base.base_model_module import BaseModelModule
 from dolphin.models.utils import load_checkpoint
 
 
 @Registers.backbone.register
-class DLASeg(BaseModelModule):
+class DLASeg(base.BaseModelModule):
     
     def __init__(self, 
                  depth,

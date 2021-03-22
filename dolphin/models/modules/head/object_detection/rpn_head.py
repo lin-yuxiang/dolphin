@@ -2,20 +2,19 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from dolphin.base.base_model_module import BaseModelModule
 from .assigner import MaxIoUAssigner
 from .coder import DeltaXYWHBBoxCoder
 from .anchor_generator import AnchorGenerator
 from .samplers import RandomSampler, PseudoSampler
 from dolphin.utils.extensions import batched_nms
 from dolphin.models.utils import normal_init
-from dolphin.utils import (Registers, build_module_from_registers, 
-                         images_to_levels, anchor_inside_flags, unmap, 
-                         multi_apply)
+from dolphin.utils import (Registers, build_module_from_registers, base,
+                           images_to_levels, anchor_inside_flags, unmap, 
+                           multi_apply)
 
 
 @Registers.head.register
-class RPNHead(BaseModelModule):
+class RPNHead(base.BaseModelModule):
 
     def __init__(self,
                  num_classes=1,

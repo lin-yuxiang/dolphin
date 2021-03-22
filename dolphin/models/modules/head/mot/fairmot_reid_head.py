@@ -2,13 +2,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 
-from dolphin.base.base_model_module import BaseModelModule 
-from dolphin.utils import (Registers, tranpose_and_gather_feat, 
-                         build_module_from_registers)
+from dolphin.utils import (Registers, tranpose_and_gather_feat, base, 
+                           build_module_from_registers)
 
 
 @Registers.head.register
-class FairMOTReIDHead(BaseModelModule):
+class FairMOTReIDHead(base.BaseModelModule):
 
     def __init__(self,
                  channels,
