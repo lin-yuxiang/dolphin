@@ -3,13 +3,12 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from dolphin.utils import Registers, build_module_from_registers
-from dolphin.base.base_model_module import BaseModelModule
+from dolphin.utils import Registers, build_module_from_registers, base
 from dolphin.models.utils import kaiming_init
 
 
 @Registers.head.register
-class BMNHead(BaseHead):
+class BMNHead(base.BaseModelModule):
 
     def __init__(self,
                  temporal_scale,
