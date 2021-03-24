@@ -9,7 +9,7 @@ class BaseModule():
     def __init__(self):
         self._dolphin_modules = OrderedDict()
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name):
         if '_dolphin_modules' in self.__dict__:
             _dolphin_modules = self.__dict__['_dolphin_modules']
             if name in _dolphin_modules:
@@ -17,7 +17,7 @@ class BaseModule():
         raise AttributeError("'{}' object has no attribute '{}'".format(
             type(self).__name__, name))
 
-    def __setattr__(self, name: str, value: Any) -> None:
+    def __setattr__(self, name, value):
         _dolphin_modules = self.__dict__.get('_dolphin_modules')
         if isinstance(value, BaseModule):
             if _dolphin_modules is None:
@@ -33,7 +33,7 @@ class BaseModule():
         else:
             object.__setattr__(self, name, value)
     
-    def __delattr__(self, name: str) -> None:
+    def __delattr__(self, name):
         if name in self._dolphin_modules:
             del self._dolphin_modules[name]
         else:

@@ -19,7 +19,7 @@ class BaseModelModule(BaseModule, nn.Module, metaclass=ABCMeta):
     def forward(self):
         pass
 
-    def __setattr__(self, name: str, value: Any) -> None:
+    def __setattr__(self, name, value):
         def remove_from(*dicts):
             for d in dicts:
                 if name in d:
@@ -76,7 +76,7 @@ class BaseModelModule(BaseModule, nn.Module, metaclass=ABCMeta):
                 else:
                     object.__setattr__(self, name, value)
         
-    def __delattr__(self, name: str) -> None:
+    def __delattr__(self, name):
         if name in self._parameters:
             del self._parameters[name]
         elif name in self._buffers:
