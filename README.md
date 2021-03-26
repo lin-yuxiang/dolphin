@@ -81,3 +81,14 @@ As the name suggests, the part of engine, algorithm and data are used for specif
 ### Start Running:
 
 After finishing above steps, it's quickly to run ``python $(DOLPHIN_ROOT)/dolphin/main.py --config $(CONFIGURATION FILE PATH)`` on the terminal to start the task.
+
+
+## License
+
+This project is released under [Open-Intelligence Open Source License V1.1](LICENSE).
+
+## Acknowledgement 
+
+This repo is mainly inspired by [MMDetection](https://github.com/open-mmlab/mmdetection),
+[PaddlePaddle CV](https://github.com/PaddlePaddle/models/blob/v1.4/PaddleCV) and
+[Delta](https://github.com/Delta-ML/delta). We thanks the authors for the incredible work.
